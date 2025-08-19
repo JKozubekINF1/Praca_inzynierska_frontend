@@ -1,0 +1,25 @@
+.container {
+  padding-top: 20px;
+  padding-bottom: 20px;
+}
+
+.card {
+  border: none;
+  border-radius: 8px;
+}
+
+.form .form-group {
+  margin-bottom: 1.5rem;
+}
+
+.form-control {
+  border-radius: 4px;
+}
+
+.button {
+  border-radius: 4px;
+}
+
+.message {
+  font-size: 0.9rem;
+}
