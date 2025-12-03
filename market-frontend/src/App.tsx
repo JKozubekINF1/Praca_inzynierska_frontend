@@ -8,6 +8,7 @@ import AuctionDetail from './components/AuctionDetail';
 import Layout from './components/Layout';
 import AddAnnouncementPage from './components/add-announcement';
 import ProfilePage from './components/Profile';
+import Search from './components/Search';
 import './App.css';
 
 
@@ -60,6 +61,7 @@ const AppContent: React.FC<{ isAuthenticated: boolean; setIsAuthenticated: (valu
           <Route path="/auction/:id" element={<AuctionDetail />} />
           <Route path="/add-announcement" element={<AddAnnouncementPage />} />
           <Route path="/profile" element={<ProfilePage />} />
+          <Route path="/search" element={<Search />} />
         </Routes>
       </Layout>
     </>
