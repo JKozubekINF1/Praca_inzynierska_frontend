@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
+import { Toaster } from 'react-hot-toast'; 
 import axios, { AxiosError, type AxiosResponse } from 'axios';
+
 import Login from './pages/Login';
 import Register from './pages/Register';
 import Home from './pages/Home';
@@ -9,9 +11,8 @@ import Layout from './components/Layout';
 import AddAnnouncementPage from './pages/add-announcement';
 import ProfilePage from './pages/Profile';
 import Search from './pages/Search';
+import EditAnnouncementPage from './pages/EditAnnouncementPage';
 import './App.css';
-
-
 
 const AppContent: React.FC<{ isAuthenticated: boolean; setIsAuthenticated: (value: boolean) => void }> = ({ isAuthenticated, setIsAuthenticated }) => {
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -59,10 +60,11 @@ const AppContent: React.FC<{ isAuthenticated: boolean; setIsAuthenticated: (valu
           <Route path="/login" element={<Login setIsAuthenticated={setIsAuthenticated} />} />
           <Route path="/register" element={<Register />} />
           <Route path="/auction/:id" element={<AuctionDetail />} />
+          <Route path="/announcements/:id" element={<AuctionDetail />} />         
           <Route path="/add-announcement" element={<AddAnnouncementPage />} />
+          <Route path="/edit-announcement/:id" element={<EditAnnouncementPage />} /> 
           <Route path="/profile" element={<ProfilePage />} />
           <Route path="/search" element={<Search />} />
-          <Route path="/announcements/:id" element={<AuctionDetail />} />
         </Routes>
       </Layout>
     </>
@@ -73,6 +75,8 @@ const App: React.FC = () => {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
   return (
     <Router>
+      <Toaster position="top-center" toastOptions={{ duration: 4000 }} />
+      
       <AppContent isAuthenticated={isAuthenticated} setIsAuthenticated={setIsAuthenticated} />
     </Router>
   );
