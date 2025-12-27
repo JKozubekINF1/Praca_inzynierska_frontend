@@ -1,5 +1,7 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import axios from 'axios';
+import { API_BASE_URL } from '../config';
 
 interface NavbarProps {
     isAuthenticated: boolean;
@@ -11,72 +13,86 @@ const Navbar: React.FC<NavbarProps> = ({ isAuthenticated, setIsAuthenticated }) 
 
     const handleLogout = async () => {
         try {
-            // Upewnij się, że port i protokół (http/https) są poprawne
-            const response = await fetch('https://localhost:7143/api/Auth/logout', { 
-                method: 'POST',
-                credentials: 'include',
+            await axios.post(`${API_BASE_URL}/api/Auth/logout`, {}, {
+                withCredentials: true
             });
-            if (response.ok) {
-                setIsAuthenticated(false);
-                navigate('/login');
-            } else {
-                console.error('Błąd podczas wylogowania:', await response.text());
-            }
+            setIsAuthenticated(false);
+            navigate('/login');
         } catch (error) {
-            console.error('Błąd podczas wylogowania:', error);
+            console.error('Logout failed:', error);
+            setIsAuthenticated(false);
+            navigate('/login');
         }
     };
 
-    return (
-        <nav className="flex items-center justify-between bg-white p-4 shadow-sm border-b border-gray-200">
-            {/* Lewa strona - Linki nawigacyjne */}
-            <div className="flex items-center space-x-6">
-                {/* Logo / Home */}
-                <Link to="/" className="text-xl font-bold text-blue-600 tracking-tight">
-                    MarketApp
-                </Link>
+    const navLinkClass = "text-gray-700 hover:text-blue-600 font-medium transition-colors";
+    const buttonPrimaryClass = "bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition font-medium text-sm shadow-sm";
+    const buttonGreenClass = "bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 transition font-medium text-sm shadow-sm flex items-center gap-1";
 
-                {/* Dropdown Aukcje */}
-                <div className="group inline-block relative">
-                    <button className="text-gray-700 hover:text-blue-600 font-medium py-2 flex items-center gap-1">
-                        Aukcje
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path></svg>
-                    </button>
-                    <div className="hidden group-hover:block absolute top-full left-0 bg-white text-gray-900 py-2 rounded-lg shadow-xl border border-gray-100 z-50 min-w-[150px]">
-                        <Link to="/category/cars" className="block px-4 py-2 hover:bg-gray-50 transition-colors">Samochody</Link>
-                        <Link to="/category/parts" className="block px-4 py-2 hover:bg-gray-50 transition-colors">Części</Link>
+    return (
+        <nav className="sticky top-0 z-50 bg-white shadow-sm border-b border-gray-200">
+            <div className="container mx-auto px-4">
+                <div className="flex items-center justify-between h-16">
+                    <div className="flex items-center gap-8">
+                        <Link to="/" className="text-2xl font-bold text-blue-600 tracking-tight hover:text-blue-700 transition">
+                            MarketApp
+                        </Link>
+                        <div className="hidden md:flex items-center space-x-6">
+                            <Link to="/search" className={`${navLinkClass} flex items-center gap-1`}>
+                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                                Szukaj
+                            </Link>
+                            <div className="group relative">
+                                <button className={`${navLinkClass} flex items-center gap-1`}>
+                                    Kategorie
+                                    <svg className="w-4 h-4 transition-transform group-hover:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path></svg>
+                                </button>
+                                <div className="hidden group-hover:block absolute top-full left-0 pt-2 w-48">
+                                    <div className="bg-white rounded-lg shadow-xl border border-gray-100 overflow-hidden">
+                                        <Link to="/search?category=Pojazd" className="block px-4 py-3 hover:bg-blue-50 text-gray-700 hover:text-blue-700 transition">
+                                            Samochody
+                                        </Link>
+                                        <Link to="/search?category=Część" className="block px-4 py-3 hover:bg-blue-50 text-gray-700 hover:text-blue-700 transition">
+                                            Części
+                                        </Link>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div className="flex items-center space-x-4">
+                        {isAuthenticated ? (
+                            <>
+                                <Link to="/add-announcement" className={buttonGreenClass}>
+                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4"></path></svg>
+                                    <span className="hidden sm:inline">Dodaj ogłoszenie</span>
+                                    <span className="sm:hidden">Dodaj</span>
+                                </Link>
+                                
+                                <div className="h-6 w-px bg-gray-300 mx-2"></div>
+
+                                <Link to="/profile" className={navLinkClass}>
+                                    Profil
+                                </Link>
+                                <button
+                                    onClick={handleLogout}
+                                    className="text-red-500 hover:text-red-700 font-medium transition-colors"
+                                >
+                                    Wyloguj
+                                </button>
+                            </>
+                        ) : (
+                            <>
+                                <Link to="/login" className={navLinkClass}>
+                                    Zaloguj
+                                </Link>
+                                <Link to="/register" className={buttonPrimaryClass}>
+                                    Rejestracja
+                                </Link>
+                            </>
+                        )}
                     </div>
                 </div>
-
-                {/* --- NOWY LINK DO WYSZUKIWARKI --- */}
-                <Link to="/search" className="text-gray-700 hover:text-blue-600 font-medium flex items-center gap-1">
-                    🔍 Szukaj
-                </Link>
-            </div>
-
-            {/* Prawa strona - Auth */}
-            <div className="flex items-center space-x-4">
-                {isAuthenticated ? (
-                    <>
-                        <Link to="/add-announcement" className="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 transition font-medium text-sm">
-                            + Dodaj ogłoszenie
-                        </Link>
-                        <Link to="/profile" className="text-gray-700 hover:text-blue-600 font-medium">
-                            Profil
-                        </Link>
-                        <button
-                            onClick={handleLogout}
-                            className="text-red-600 hover:text-red-800 font-medium"
-                        >
-                            Wyloguj
-                        </button>
-                    </>
-                ) : (
-                    <>
-                        <Link to="/login" className="text-gray-700 hover:text-blue-600 font-medium">Zaloguj</Link>
-                        <Link to="/register" className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition font-medium text-sm">Rejestracja</Link>
-                    </>
-                )}
             </div>
         </nav>
     );

@@ -1,14 +1,14 @@
 import { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 import axios, { AxiosError, type AxiosResponse } from 'axios';
-import Login from './components/Login';
-import Register from './components/Register';
-import Home from './components/Home';
-import AuctionDetail from './components/AuctionDetail';
+import Login from './pages/Login';
+import Register from './pages/Register';
+import Home from './pages/Home';
+import AuctionDetail from './pages/AuctionDetail';
 import Layout from './components/Layout';
-import AddAnnouncementPage from './components/add-announcement';
-import ProfilePage from './components/Profile';
-import Search from './components/Search';
+import AddAnnouncementPage from './pages/add-announcement';
+import ProfilePage from './pages/Profile';
+import Search from './pages/Search';
 import './App.css';
 
 
@@ -62,6 +62,7 @@ const AppContent: React.FC<{ isAuthenticated: boolean; setIsAuthenticated: (valu
           <Route path="/add-announcement" element={<AddAnnouncementPage />} />
           <Route path="/profile" element={<ProfilePage />} />
           <Route path="/search" element={<Search />} />
+          <Route path="/announcements/:id" element={<AuctionDetail />} />
         </Routes>
       </Layout>
     </>
