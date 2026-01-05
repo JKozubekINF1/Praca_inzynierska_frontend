@@ -58,7 +58,9 @@ const AddAnnouncementPage: React.FC = () => {
                                     </div>
                                 </div>
                             </div>
+
                             <PhotoUploader photos={photos} onChange={handlePhotosChange} onRemove={removePhoto} />
+
                             {category === "Pojazd" && (
                                 <div className="mt-6 border-t pt-6">
                                     <h3 className="text-xl font-bold border-b pb-2 mb-4">Dane pojazdu</h3>
@@ -135,6 +137,7 @@ const AddAnnouncementPage: React.FC = () => {
                                             </select>
                                         </div>
                                     </div>
+
                                     <div className="mt-8">
                                         <h4 className="font-bold text-lg mb-3">Wyposażenie dodatkowe</h4>
                                         <div className="grid grid-cols-2 md:grid-cols-4 gap-3 bg-gray-50 p-4 rounded-lg">
@@ -153,6 +156,7 @@ const AddAnnouncementPage: React.FC = () => {
                                     </div>
                                 </div>
                             )}
+
                             {category === "Część" && (
                                 <div className="mt-6 border-t pt-6">
                                     <h3 className="text-xl font-bold border-b pb-2 mb-4">Dane części</h3>
@@ -179,6 +183,7 @@ const AddAnnouncementPage: React.FC = () => {
                                     </div>
                                 </div>
                             )}
+
                             <div className="space-y-4 border-t pt-6 mt-6">
                                 <h3 className="text-xl font-bold border-b pb-2">Opis i Kontakt</h3>
                                 <div>

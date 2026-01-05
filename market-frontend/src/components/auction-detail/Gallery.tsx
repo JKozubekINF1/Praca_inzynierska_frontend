@@ -1,59 +1,97 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import ImageGallery from 'react-image-gallery';
+import 'react-image-gallery/styles/css/image-gallery.css';
 import type { Announcement } from '../../types';
 import { API_BASE_URL } from '../../config';
 
 interface Props {
-    announcement: Announcement;
-    activePhotoUrl: string | null;
-    setActivePhotoUrl: (url: string) => void;
+  announcement: Announcement;
 }
 
-export const Gallery: React.FC<Props> = ({ announcement, activePhotoUrl, setActivePhotoUrl }) => {
-    const getLink = (path?: string) => {
-        if (!path) return 'https://placehold.co/600x400';
-        if (path.startsWith('http')) return path;
-        return `${API_BASE_URL}${path}`;
-    };
+export const Gallery: React.FC<Props> = ({ announcement }) => {
+  const [items, setItems] = useState<any[]>([]);
 
-    return (
-        <div className="bg-white rounded-2xl overflow-hidden shadow-sm border border-gray-100">
-            <div className="aspect-w-16 aspect-h-9 bg-gray-100 flex items-center justify-center relative h-[450px]">
-                {activePhotoUrl ? (
-                    <img 
-                        src={getLink(activePhotoUrl)} 
-                        alt={announcement.title} 
-                        className="w-full h-full object-contain bg-gray-900" 
-                    />
-                ) : (
-                    <div className="flex flex-col items-center text-gray-400">
-                        <span className="font-medium">Brak zdjęć</span>
-                    </div>
-                )}
-                <div className="absolute top-4 left-4 bg-blue-600/90 text-white px-3 py-1 rounded-md text-xs font-bold uppercase tracking-wider shadow-sm backdrop-blur-sm">
-                    {announcement.category}
-                </div>
-            </div>
-            {announcement.photos && announcement.photos.length > 1 && (
-                <div className="p-4 flex gap-3 overflow-x-auto scrollbar-hide bg-white border-t border-gray-100">
-                    {announcement.photos.map((photo) => (
-                        <button 
-                            key={photo.id}
-                            onClick={() => setActivePhotoUrl(photo.photoUrl)}
-                            className={`flex-shrink-0 w-20 h-20 rounded-lg overflow-hidden border-2 transition-all ${
-                                activePhotoUrl === photo.photoUrl 
-                                ? 'border-blue-600 ring-2 ring-blue-100' 
-                                : 'border-transparent hover:border-gray-300'
-                            }`}
-                        >
-                            <img 
-                                src={getLink(photo.photoUrl)} 
-                                alt="Miniaturka" 
-                                className="w-full h-full object-cover"
-                            />
-                        </button>
-                    ))}
-                </div>
+  
+  const getFullUrl = (path?: string): string => {
+    if (!path) return 'https://placehold.co/800x600?text=Brak+zdjęcia';
+    if (path.startsWith('http')) return path;
+    return `${API_BASE_URL}${path.startsWith('/') ? '' : '/'}${path}`;
+  };
+
+  useEffect(() => {
+    if (!announcement.photos || announcement.photos.length === 0) {
+      setItems([
+        {
+          original: 'https://placehold.co/800x600?text=Brak+zdjęć',
+          thumbnail: 'https://placehold.co/150x100?text=Brak+zdjęć',
+          description: 'Brak zdjęć dla tego ogłoszenia',
+        },
+      ]);
+      return;
+    }
+
+    const galleryItems = announcement.photos.map((photo) => ({
+      original: getFullUrl(photo.photoUrl),
+      thumbnail: getFullUrl(photo.photoUrl),
+      originalAlt: `${announcement.title} - ${announcement.category}`,
+      thumbnailAlt: 'Miniaturka',
+      
+      
+    }));
+
+    setItems(galleryItems);
+  }, [announcement]);
+
+  return (
+    <div className="bg-white rounded-2xl overflow-hidden shadow-sm border border-gray-100">
+      {}
+      <div className="absolute top-6 left-6 z-10 bg-blue-600 text-white px-4 py-2 rounded-md text-sm font-bold uppercase tracking-wider shadow-lg">
+        {announcement.category}
+      </div>
+
+      {}
+      <div className="relative">
+        {items.length > 0 ? (
+          <ImageGallery
+            items={items}
+            showPlayButton={true}           
+            showFullscreenButton={true}      
+            showNav={true}                   
+            showThumbnails={true}            
+            thumbnailPosition="bottom"       
+            useBrowserFullscreen={true}
+            lazyLoad={true}                  
+            slideDuration={450}
+            slideInterval={4000}
+            additionalClass="auction-gallery"
+            
+            autoPlay={false}
+            
+            showIndex={true}
+            renderItem={(item) => (
+              <div className="image-gallery-image">
+                <img
+                  src={item.original}
+                  alt={item.originalAlt}
+                  className="w-full h-full object-contain bg-black"
+                  loading="lazy"
+                />
+              </div>
             )}
+          />
+        ) : (
+          <div className="aspect-w-16 aspect-h-9 bg-gray-900 flex items-center justify-center h-[500px]">
+            <span className="text-gray-400 text-xl font-medium">Ładowanie zdjęć...</span>
+          </div>
+        )}
+      </div>
+
+      {}
+      {announcement.photos && announcement.photos.length > 0 && (
+        <div className="px-6 py-3 bg-gray-50 text-center text-sm text-gray-600">
+          {announcement.photos.length} zdjęć • Kliknij w miniaturkę lub użyj strzałek
         </div>
-    );
+      )}
+    </div>
+  );
 };

@@ -41,11 +41,13 @@ const EditAnnouncementPage: React.FC = () => {
                 }
 
                 if (data.category === "Pojazd" && data.vehicleDetails) {
-                    setVehicleData({ ...data.vehicleDetails });
+                    const { id: vId, ...rest } = data.vehicleDetails;
+                    setVehicleData(rest);
                 }
 
                 if (data.category === "Część" && data.partDetails) {
-                    setPartData({ ...data.partDetails });
+                    const { id: pId, ...rest } = data.partDetails;
+                    setPartData(rest);
                 }
                 
             } catch (err) {
@@ -80,7 +82,14 @@ const EditAnnouncementPage: React.FC = () => {
                 <form onSubmit={(e) => submitEdit(e, Number(id))} className="space-y-6">
                     <div>
                         <label className="text-xl font-bold text-black mb-2 block">Kategoria</label>
-                        <input value={category} disabled className={`${inputClass} bg-gray-100 cursor-not-allowed`} />
+                        <select 
+                            value={category} 
+                            disabled
+                            className={`${inputClass} bg-gray-100 cursor-not-allowed`}
+                        >
+                            <option value="Pojazd">Samochód osobowy</option>
+                            <option value="Część">Część samochodowa</option>
+                        </select>
                     </div>
 
                     <div className="space-y-4">
@@ -127,6 +136,31 @@ const EditAnnouncementPage: React.FC = () => {
                                     </select>
                                 </div>
                                 <div><label className={labelClass}>VIN</label><input name="vin" value={vehicleData.vin} onChange={handleVehicleChange} className={inputClass} /></div>
+                                <div>
+                                    <label className={labelClass}>Skrzynia biegów</label>
+                                    <select name="gearbox" value={vehicleData.gearbox} onChange={handleVehicleChange} className={inputClass}>
+                                        <option>Manualna</option><option>Automatyczna</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label className={labelClass}>Napęd</label>
+                                    <select name="driveType" value={vehicleData.driveType} onChange={handleVehicleChange} className={inputClass}>
+                                        <option>FWD</option><option>RWD</option><option>AWD/4x4</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label className={labelClass}>Nadwozie</label>
+                                    <select name="bodyType" value={vehicleData.bodyType} onChange={handleVehicleChange} className={inputClass}>
+                                        <option>Sedan</option><option>Kombi</option><option>Hatchback</option><option>SUV</option><option>Coupe</option><option>Kabriolet</option>
+                                    </select>
+                                </div>
+                                <div><label className={labelClass}>Kolor</label><input name="color" value={vehicleData.color} onChange={handleVehicleChange} className={inputClass} /></div>
+                                <div>
+                                    <label className={labelClass}>Stan</label>
+                                    <select name="state" value={vehicleData.state} onChange={handleVehicleChange} className={inputClass}>
+                                        <option>Używany</option><option>Nowy</option><option>Uszkodzony</option>
+                                    </select>
+                                </div>
                             </div>
 
                             <div className="mt-8">
@@ -150,6 +184,12 @@ const EditAnnouncementPage: React.FC = () => {
                                 <div><label className={labelClass}>Nazwa części</label><input name="partName" value={partData.partName} onChange={handlePartChange} className={inputClass} /></div>
                                 <div><label className={labelClass}>Numer katalogowy</label><input name="partNumber" value={partData.partNumber} onChange={handlePartChange} className={inputClass} /></div>
                                 <div className="md:col-span-2"><label className={labelClass}>Pasuje do</label><input name="compatibility" value={partData.compatibility} onChange={handlePartChange} className={inputClass} /></div>
+                                <div>
+                                    <label className={labelClass}>Stan</label>
+                                    <select name="state" value={partData.state} onChange={handlePartChange} className={inputClass}>
+                                        <option>Używany</option><option>Nowy</option><option>Regenerowany</option>
+                                    </select>
+                                </div>
                             </div>
                         </div>
                     )}

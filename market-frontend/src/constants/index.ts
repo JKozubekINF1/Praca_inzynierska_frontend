@@ -4,3 +4,4 @@ export const PREDEFINED_FEATURES = [
     "Bluetooth", "Czujniki parkowania", "Kamera cofania", "Tempomat",
     "Światła LED", "Hak", "Szyberdach", "Alufelgi", "Isofix"
 ];
+

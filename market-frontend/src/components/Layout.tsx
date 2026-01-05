@@ -1,17 +1,23 @@
 import React from 'react';
 import type { ReactNode } from 'react';
 import Navbar from './Navbar';
+import type { User } from '../types';
 
 interface LayoutProps {
   children: ReactNode;
   isAuthenticated: boolean;
   setIsAuthenticated: (value: boolean) => void;
+  user: User | null;
 }
 
-const Layout: React.FC<LayoutProps> = ({ children, isAuthenticated, setIsAuthenticated }) => {
+const Layout: React.FC<LayoutProps> = ({ children, isAuthenticated, setIsAuthenticated, user }) => {
   return (
     <div className="min-h-screen flex flex-col bg-gray-50 text-gray-900 font-sans">
-      <Navbar isAuthenticated={isAuthenticated} setIsAuthenticated={setIsAuthenticated} />
+      <Navbar 
+        isAuthenticated={isAuthenticated} 
+        setIsAuthenticated={setIsAuthenticated} 
+        user={user} 
+      />
       <main className="flex-1 w-full">
         {children}
       </main>
@@ -34,7 +40,6 @@ const Layout: React.FC<LayoutProps> = ({ children, isAuthenticated, setIsAuthent
           </p>
         </div>
       </footer>
-
     </div>
   );
 };

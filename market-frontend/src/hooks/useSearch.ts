@@ -4,7 +4,7 @@ import type { SearchResultItem } from '../types';
 import { announcementService } from '../services/announcementService';
 
 export const useSearch = () => {
-    const [searchParams, setSearchParams] = useSearchParams();
+    const [searchParams] = useSearchParams();
     const [query, setQuery] = useState(searchParams.get('q') || '');
     const [category, setCategory] = useState(searchParams.get('category') || '');
     const [minPrice, setMinPrice] = useState('');

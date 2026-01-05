@@ -2,18 +2,20 @@ import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { API_BASE_URL } from '../config';
+import type { User } from '../types';
 
 interface NavbarProps {
     isAuthenticated: boolean;
     setIsAuthenticated: (value: boolean) => void;
+    user: User | null;
 }
 
-const Navbar: React.FC<NavbarProps> = ({ isAuthenticated, setIsAuthenticated }) => {
+const Navbar: React.FC<NavbarProps> = ({ isAuthenticated, setIsAuthenticated, user }) => {
     const navigate = useNavigate();
 
     const handleLogout = async () => {
         try {
-            await axios.post(`${API_BASE_URL}/api/Auth/logout`, {}, {
+            await axios.post(`${API_BASE_URL}/api/auth/logout`, {}, {
                 withCredentials: true
             });
             setIsAuthenticated(false);
@@ -63,6 +65,12 @@ const Navbar: React.FC<NavbarProps> = ({ isAuthenticated, setIsAuthenticated }) 
                     <div className="flex items-center space-x-4">
                         {isAuthenticated ? (
                             <>
+                                {user?.role === 'Admin' && (
+                                    <Link to="/admin" className="bg-purple-600 text-white px-4 py-2 rounded-md hover:bg-purple-700 transition font-medium text-sm shadow-sm">
+                                        Panel Admina
+                                    </Link>
+                                )}
+
                                 <Link to="/add-announcement" className={buttonGreenClass}>
                                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4"></path></svg>
                                     <span className="hidden sm:inline">Dodaj ogłoszenie</span>

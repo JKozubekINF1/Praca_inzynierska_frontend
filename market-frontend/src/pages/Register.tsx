@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import axios, { AxiosError } from 'axios';
 import { useNavigate } from 'react-router-dom';
+import ReCAPTCHA from 'react-google-recaptcha';
 import type { RegisterDto } from '../types';
 import { API_BASE_URL } from '../config';
 
@@ -12,8 +13,12 @@ const Register: React.FC = () => {
     confirmPassword: '',
   });
 
+  const [captchaToken, setCaptchaToken] = useState<string | null>(null);
+  const recaptchaRef = useRef<ReCAPTCHA>(null);
   const [message, setMessage] = useState<string>('');
   const navigate = useNavigate();
+
+  const SITE_KEY = import.meta.env.VITE_RECAPTCHA_SITE_KEY || "";
 
   useEffect(() => {
     const checkAuthStatus = async () => {
@@ -47,6 +52,8 @@ const Register: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setMessage('');
+
     if (formData.password !== formData.confirmPassword) {
       setMessage('Hasła nie są zgodne!');
       return;
@@ -58,13 +65,28 @@ const Register: React.FC = () => {
       return;
     }
 
+    if (!captchaToken) {
+      setMessage('Potwierdź, że nie jesteś robotem.');
+      return;
+    }
+
     try {
-      const response = await axios.post(`${API_BASE_URL}/api/auth/register`, formData);
+      const payload = {
+        ...formData,
+        recaptchaToken: captchaToken
+      };
+
+      const response = await axios.post(`${API_BASE_URL}/api/auth/register`, payload);
+      
       setMessage(typeof response.data === 'string' ? response.data : 'Rejestracja zakończona pomyślnie!');
       setTimeout(() => navigate('/login'), 1500);
+
     } catch (error) {
       const axiosError = error as AxiosError;
       setMessage((axiosError.response?.data as string) || 'Błąd podczas rejestracji');
+      
+      recaptchaRef.current?.reset();
+      setCaptchaToken(null);
     }
   };
 
@@ -131,6 +153,14 @@ const Register: React.FC = () => {
               placeholder="Potwierdź hasło"
               required
             />
+          </div>
+
+          <div className="flex justify-center mt-4 mb-2">
+             <ReCAPTCHA
+                ref={recaptchaRef}
+                sitekey={SITE_KEY}
+                onChange={(token) => setCaptchaToken(token)}
+             />
           </div>
 
           <button 

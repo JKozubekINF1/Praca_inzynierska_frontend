@@ -1,35 +1,59 @@
-import { useState, useEffect } from 'react';
-import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
-import { Toaster } from 'react-hot-toast'; 
-import axios, { AxiosError, type AxiosResponse } from 'axios';
-
+import React, { useState, useEffect } from 'react';
+import { BrowserRouter as Router, Routes, Route, useLocation, Navigate } from 'react-router-dom';
+import { Toaster } from 'react-hot-toast';
+import axios, { AxiosError } from 'axios';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import Home from './pages/Home';
 import AuctionDetail from './pages/AuctionDetail';
-import Layout from './components/Layout';
 import AddAnnouncementPage from './pages/add-announcement';
+import EditAnnouncementPage from './pages/EditAnnouncementPage';
 import ProfilePage from './pages/Profile';
 import Search from './pages/Search';
-import EditAnnouncementPage from './pages/EditAnnouncementPage';
+import AdminPanel from './pages/AdminPanel';
+import Layout from './components/Layout';
+import UserProfilePage from './pages/UserProfilePage';
+import { API_BASE_URL } from './config';
+import type { User } from './types';
 import './App.css';
 
-const AppContent: React.FC<{ isAuthenticated: boolean; setIsAuthenticated: (value: boolean) => void }> = ({ isAuthenticated, setIsAuthenticated }) => {
+const AdminRoute = ({ user, children }: { user: User | null, children: React.ReactNode }) => {
+  if (!user) {
+    return <Navigate to="/login" replace />;
+  }
+  if (user.role !== 'Admin') {
+    return <Navigate to="/" replace />;
+  }
+  return children;
+};
+
+const AppContent: React.FC<{ 
+  user: User | null; 
+  setUser: React.Dispatch<React.SetStateAction<User | null>>; 
+}> = ({ user, setUser }) => {
+  
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [showTransition, setShowTransition] = useState<boolean>(false);
   const location = useLocation();
 
   const checkAuth = async () => {
     try {
-      const response: AxiosResponse = await axios.get('https://localhost:7143/api/auth/verify', {
+      const response = await axios.get(`${API_BASE_URL}/api/auth/verify`, {
         withCredentials: true,
       });
-      if (response.status === 200) setIsAuthenticated(true);
-      else setIsAuthenticated(false);
+
+      if (response.status === 200 && response.data.user) {
+        setUser({
+          username: response.data.user.username,
+          role: response.data.user.role
+        });
+      } else {
+        setUser(null);
+      }
     } catch (error) {
       const axiosError = error as AxiosError;
       console.error('Błąd weryfikacji tokenu:', axiosError);
-      setIsAuthenticated(false);
+      setUser(null);
     } finally {
       setIsLoading(false);
     }
@@ -47,6 +71,8 @@ const AppContent: React.FC<{ isAuthenticated: boolean; setIsAuthenticated: (valu
 
   if (isLoading) return <div className="flex justify-center items-center h-screen">Ładowanie...</div>;
 
+  const isAuthenticated = !!user;
+
   return (
     <>
       {showTransition && (
@@ -54,17 +80,27 @@ const AppContent: React.FC<{ isAuthenticated: boolean; setIsAuthenticated: (valu
           <h1 className="text-6xl font-bold text-blue-600">Market</h1>
         </div>
       )}
-      <Layout isAuthenticated={isAuthenticated} setIsAuthenticated={setIsAuthenticated}>
+      
+      <Layout isAuthenticated={isAuthenticated} setIsAuthenticated={() => setUser(null)} user={user}>
         <Routes>
           <Route path="/" element={<Home />} />
-          <Route path="/login" element={<Login setIsAuthenticated={setIsAuthenticated} />} />
+          <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           <Route path="/auction/:id" element={<AuctionDetail />} />
-          <Route path="/announcements/:id" element={<AuctionDetail />} />         
+          <Route path="/announcements/:id" element={<AuctionDetail />} />        
           <Route path="/add-announcement" element={<AddAnnouncementPage />} />
           <Route path="/edit-announcement/:id" element={<EditAnnouncementPage />} /> 
           <Route path="/profile" element={<ProfilePage />} />
           <Route path="/search" element={<Search />} />
+          <Route path="/users/:id" element={<UserProfilePage />} />
+          <Route 
+            path="/admin" 
+            element={
+              <AdminRoute user={user}>
+                <AdminPanel />
+              </AdminRoute>
+            } 
+          />
         </Routes>
       </Layout>
     </>
@@ -72,12 +108,12 @@ const AppContent: React.FC<{ isAuthenticated: boolean; setIsAuthenticated: (valu
 };
 
 const App: React.FC = () => {
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
+  const [user, setUser] = useState<User | null>(null);
+
   return (
     <Router>
       <Toaster position="top-center" toastOptions={{ duration: 4000 }} />
-      
-      <AppContent isAuthenticated={isAuthenticated} setIsAuthenticated={setIsAuthenticated} />
+      <AppContent user={user} setUser={setUser} />
     </Router>
   );
 };

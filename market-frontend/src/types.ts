@@ -132,3 +132,8 @@ export interface AnnouncementSummary {
     photoUrl?: string;
     location: string;
 }
+
+export interface User {
+  username: string;
+  role: string; 
+}

@@ -1,37 +1,22 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useRef } from 'react';
 import axios, { AxiosError } from 'axios';
 import { useNavigate } from 'react-router-dom';
+import ReCAPTCHA from 'react-google-recaptcha';
 import type { LoginDto } from '../types';
 import { API_BASE_URL } from '../config';
 
-interface LoginProps {
-  setIsAuthenticated: (value: boolean) => void;
-}
-
-const Login: React.FC<LoginProps> = ({ setIsAuthenticated }) => {
-  const [formData, setFormData] = useState<LoginDto>({
+const Login: React.FC = () => {
+  const [formData, setFormData] = useState<Omit<LoginDto, 'recaptchaToken'>>({
     username: '',
     password: '',
   });
 
+  const [captchaToken, setCaptchaToken] = useState<string | null>(null);
+  const recaptchaRef = useRef<ReCAPTCHA>(null);
   const [message, setMessage] = useState<string>('');
   const navigate = useNavigate();
 
-  useEffect(() => {
-    const checkAuthStatus = async () => {
-      try {
-        const response = await axios.get(`${API_BASE_URL}/api/auth/verify`, {
-          withCredentials: true,
-        });
-        if (response.status === 200) {
-          navigate('/');
-        }
-      } catch (error) {
-        console.log('Użytkownik nie jest zalogowany (oczekiwane na ekranie logowania).');
-      }
-    };
-    checkAuthStatus();
-  }, [navigate]);
+  const SITE_KEY = import.meta.env.VITE_RECAPTCHA_SITE_KEY || "";
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -39,16 +24,46 @@ const Login: React.FC<LoginProps> = ({ setIsAuthenticated }) => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setMessage('');
+
+    if (!captchaToken) {
+      setMessage('Potwierdź, że nie jesteś robotem.');
+      return;
+    }
+
     try {
-      await axios.post(`${API_BASE_URL}/api/auth/login`, formData, {
-        withCredentials: true,
-      });
+      await axios.post(`${API_BASE_URL}/api/auth/login`, 
+        { 
+          ...formData, 
+          recaptchaToken: captchaToken 
+        }, 
+        { withCredentials: true }
+      );
+
       setMessage('Zalogowano pomyślnie!');
-      setIsAuthenticated(true);
-      navigate('/');
+      window.location.href = '/'; 
+
     } catch (error) {
-      const axiosError = error as AxiosError;
-      setMessage((axiosError.response?.data as string) || 'Błąd podczas logowania');
+      const axiosError = error as AxiosError<any>; 
+      
+      let errorMsg = 'Błąd podczas logowania';
+      if (axiosError.response?.data) {
+          const data = axiosError.response.data;
+          
+          if (typeof data === 'string') {
+              errorMsg = data; 
+          } else if (data.message) {
+              errorMsg = data.message; 
+          } else if (data.Message) {
+              errorMsg = data.Message;
+          } else if (data.title) {
+              errorMsg = data.title; 
+          }
+      }
+
+      setMessage(errorMsg);
+      recaptchaRef.current?.reset();
+      setCaptchaToken(null);
     }
   };
 
@@ -89,6 +104,14 @@ const Login: React.FC<LoginProps> = ({ setIsAuthenticated }) => {
             />
           </div>
 
+          <div className="flex justify-center mt-4 mb-2">
+             <ReCAPTCHA
+                ref={recaptchaRef}
+                sitekey={SITE_KEY}
+                onChange={(token) => setCaptchaToken(token)}
+             />
+          </div>
+
           <button 
             type="submit" 
             className="w-full bg-blue-600 text-white py-3 rounded-lg font-bold hover:bg-blue-700 transition shadow-md mt-2"
@@ -98,7 +121,11 @@ const Login: React.FC<LoginProps> = ({ setIsAuthenticated }) => {
         </form>
 
         {message && (
-          <div className={`mt-4 p-3 rounded-lg text-center text-sm font-medium ${message.includes('pomyślnie') ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
+          <div className={`mt-4 p-3 rounded-lg text-center text-sm font-medium border ${
+            message.includes('pomyślnie') 
+                ? 'bg-green-50 text-green-700 border-green-200' 
+                : 'bg-red-50 text-red-700 border-red-200'
+          }`}>
             {message}
           </div>
         )}
