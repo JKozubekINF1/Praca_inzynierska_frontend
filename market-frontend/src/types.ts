@@ -58,8 +58,10 @@ export interface Announcement {
     phoneNumber: string;
     contactPreference: string;
     location: string;
-    isActive: boolean; 
-    photoUrl?: string; 
+    latitude?: number;
+    longitude?: number;
+    isActive: boolean;
+    photoUrl?: string;
     vehicleDetails?: VehicleDetails;
     partDetails?: PartDetails;
     features: AnnouncementFeature[];
@@ -78,6 +80,8 @@ export interface CreateAnnouncementDto {
     phoneNumber: string;
     contactPreference: string;
     location: string;
+    latitude?: number;
+    longitude?: number;
     features: string[];
     vehicleDetails?: Omit<VehicleDetails, 'id'>;
     partDetails?: Omit<PartDetails, 'id'>;
@@ -85,14 +89,14 @@ export interface CreateAnnouncementDto {
 }
 
 export interface SearchResultItem {
-    objectID: string; 
-    id: number;       
+    objectID: string;
+    id: number;
     title: string;
     price: number;
     category: string;
     description?: string;
     location?: string;
-    photoUrl?: string; 
+    photoUrl?: string;
     createdAt?: string;
     brand?: string;
     model?: string;
@@ -134,6 +138,8 @@ export interface AnnouncementSummary {
 }
 
 export interface User {
-  username: string;
-  role: string; 
+    id: number;
+    username: string;
+    role: string;
+    email?: string;
 }

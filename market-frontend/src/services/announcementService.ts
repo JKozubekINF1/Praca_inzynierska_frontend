@@ -18,6 +18,9 @@ export const announcementService = {
         formData.append('ContactPreference', data.contactPreference);
         formData.append('Location', data.location);
 
+        if (data.latitude) formData.append('Latitude', data.latitude.toString().replace(',', '.'));
+        if (data.longitude) formData.append('Longitude', data.longitude.toString().replace(',', '.'));
+
         if (photos && photos.length > 0) {
             photos.forEach((file) => {
                 formData.append('Photos', file);
@@ -69,6 +72,9 @@ export const announcementService = {
         formData.append('PhoneNumber', data.phoneNumber);
         formData.append('ContactPreference', data.contactPreference);
         formData.append('Location', data.location);
+
+        if (data.latitude) formData.append('Latitude', data.latitude.toString().replace(',', '.'));
+        if (data.longitude) formData.append('Longitude', data.longitude.toString().replace(',', '.'));
 
         if (photos && photos.length > 0) {
             photos.forEach((file) => formData.append('Photos', file));
