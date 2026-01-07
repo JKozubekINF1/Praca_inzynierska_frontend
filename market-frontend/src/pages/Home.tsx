@@ -13,10 +13,13 @@ const Home: React.FC = () => {
     useEffect(() => {
         const fetchRecent = async () => {
             try {
-                const data = await announcementService.search({ pageSize: 6 }); 
+                const data = await announcementService.search({ 
+                    pageSize: 6,
+                    sortBy: 'newest'
+                }); 
                 setRecentAnnouncements(data.items);
             } catch (err) {
-                console.error("Błąd pobierania ofert na stronę główną", err);
+                console.error(err);
             } finally {
                 setLoading(false);
             }
@@ -28,7 +31,7 @@ const Home: React.FC = () => {
     const handleSearch = (e: React.FormEvent) => {
         e.preventDefault();
         if (searchQuery.trim()) {
-            navigate(`/search?q=${encodeURIComponent(searchQuery)}`);
+            navigate(`/search?query=${encodeURIComponent(searchQuery)}`);
         }
     };
 
@@ -164,7 +167,6 @@ const Home: React.FC = () => {
                         <p className="text-gray-500 text-sm">Zaawansowane filtry pomogą Ci znaleźć dokładnie to, czego szukasz.</p>
                     </div>
                 </div>
-
             </div>
         </div>
     );

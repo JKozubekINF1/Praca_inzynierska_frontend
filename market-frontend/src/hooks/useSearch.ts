@@ -1,54 +1,83 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import type { SearchResultItem } from '../types';
-import { announcementService } from '../services/announcementService';
+import axios from 'axios';
+import type { SearchQuery, SearchResponse } from '../types';
+
+const initialFilters: SearchQuery = {
+    page: 0,
+    pageSize: 20,
+    sortBy: 'newest',
+    category: '',
+    minPrice: '',
+    maxPrice: '',
+};
 
 export const useSearch = () => {
-    const [searchParams] = useSearchParams();
-    const [query, setQuery] = useState(searchParams.get('q') || '');
-    const [category, setCategory] = useState(searchParams.get('category') || '');
-    const [minPrice, setMinPrice] = useState('');
-    const [maxPrice, setMaxPrice] = useState('');
-    const [minYear, setMinYear] = useState('');
+    const [searchParams, setSearchParams] = useSearchParams();
+    
+    const [filters, setFilters] = useState<SearchQuery>(() => {
+        const params = Object.fromEntries(searchParams.entries());
+        return { ...initialFilters, ...params };
+    });
 
-    const [results, setResults] = useState<SearchResultItem[]>([]);
+    const [data, setData] = useState<SearchResponse | null>(null);
     const [loading, setLoading] = useState(false);
-    const [hasSearched, setHasSearched] = useState(false);
-    const search = async () => {
+    const isFirstRender = useRef(true);
+
+    const search = useCallback(async () => {
         setLoading(true);
-        setHasSearched(true);
         try {
-            const data = await announcementService.search({
-                query: query || null,
-                category: category || null,
-                minPrice: minPrice || null,
-                maxPrice: maxPrice || null,
-                minYear: minYear || null,
-                page: 0,
-                pageSize: 20
+            const params = new URLSearchParams();
+            Object.entries(filters).forEach(([key, value]) => {
+                if (value !== null && value !== '' && value !== undefined) {
+                    params.append(key, value.toString());
+                }
             });
-            setResults(data.items);
+
+            setSearchParams(params);
+
+            const response = await axios.get<SearchResponse>(`https://localhost:7143/api/announcements/search?${params.toString()}`);
+            setData(response.data);
         } catch (error) {
-            console.error("Błąd wyszukiwania:", error);
+            console.error(error);
         } finally {
             setLoading(false);
         }
-    };
+    }, [filters, setSearchParams]);
+
     useEffect(() => {
-        if (searchParams.toString()) {
-            search();
-        }
+        search();
     }, []); 
 
+    useEffect(() => {
+        if (isFirstRender.current) {
+            isFirstRender.current = false;
+            return;
+        }
+        search();
+    }, [filters.page, filters.sortBy]);
+
+    const updateFilter = (key: keyof SearchQuery, value: any) => {
+        setFilters(prev => ({
+            ...prev,
+            [key]: value,
+            page: 0
+        }));
+    };
+
+    const setPage = (page: number) => {
+        setFilters(prev => ({ ...prev, page }));
+    };
+
     return {
-        query, setQuery,
-        category, setCategory,
-        minPrice, setMinPrice,
-        maxPrice, setMaxPrice,
-        minYear, setMinYear,
-        results,
+        results: data?.items || [],
+        totalHits: data?.totalHits || 0,
+        totalPages: data?.totalPages || 0,
+        currentPage: data?.currentPage || 0,
         loading,
-        hasSearched,
+        filters,
+        updateFilter,
+        setPage,
         search
     };
 };

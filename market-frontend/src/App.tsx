@@ -45,9 +45,9 @@ const AppRoutes: React.FC = () => {
 
   useEffect(() => {
     setShowTransition(true);
-    const timer = setTimeout(() => setShowTransition(false), 1500);
+    const timer = setTimeout(() => setShowTransition(false), 1500); 
     return () => clearTimeout(timer);
-  }, [location]);
+  }, [location.pathname]);
 
   if (isLoading) {
     return <div className="flex justify-center items-center h-screen">Ładowanie aplikacji...</div>;
@@ -56,7 +56,7 @@ const AppRoutes: React.FC = () => {
   return (
     <>
       {showTransition && (
-        <div className="fixed top-0 left-0 w-screen h-screen bg-white flex justify-center items-center z-50 pointer-events-none">
+        <div className="fixed top-0 left-0 w-screen h-screen bg-white flex justify-center items-center z-50 pointer-events-none transition-opacity duration-300">
           <h1 className="text-6xl font-bold text-blue-600 animate-pulse">Market</h1>
         </div>
       )}

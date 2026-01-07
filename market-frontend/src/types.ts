@@ -72,20 +72,29 @@ export interface Announcement {
     };
 }
 
-export interface CreateAnnouncementDto {
-    title: string;
-    description: string;
-    price: number;
-    category: string;
-    phoneNumber: string;
-    contactPreference: string;
-    location: string;
-    latitude?: number;
-    longitude?: number;
-    features: string[];
-    vehicleDetails?: Omit<VehicleDetails, 'id'>;
-    partDetails?: Omit<PartDetails, 'id'>;
-    photos?: File[];
+export interface SearchQuery {
+    query?: string;
+    page?: number;
+    pageSize?: number;
+    sortBy?: string;
+    category?: string;
+    location?: string;
+    minPrice?: number | '';
+    maxPrice?: number | '';
+    state?: string;
+    brand?: string;
+    model?: string;
+    generation?: string; 
+    minYear?: number | '';
+    maxYear?: number | '';
+    minMileage?: number | '';
+    maxMileage?: number | '';
+    fuelType?: string;
+    gearbox?: string;
+    bodyType?: string;
+    driveType?: string;
+    partNumber?: string; 
+    compatibility?: string; 
 }
 
 export interface SearchResultItem {
@@ -94,14 +103,12 @@ export interface SearchResultItem {
     title: string;
     price: number;
     category: string;
-    description?: string;
-    location?: string;
     photoUrl?: string;
-    createdAt?: string;
-    brand?: string;
-    model?: string;
+    location?: string;
     year?: number;
     mileage?: number;
+    brand?: string;
+    model?: string;
 }
 
 export interface SearchResponse {
