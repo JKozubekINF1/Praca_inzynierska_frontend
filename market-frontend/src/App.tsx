@@ -14,16 +14,19 @@ import Search from './pages/Search';
 import AdminPanel from './pages/AdminPanel';
 import UserProfilePage from './pages/UserProfilePage';
 import FavoritesPage from './pages/FavoritesPage';
+import Messages from './pages/Messages';
 import Layout from './components/Layout';
 import ProtectedRoute from './components/ProtectedRoute';
 import CookieBanner from './components/common/CookieBanner';
+import OrdersPage from './pages/OrdersPage';
 import { logPageView } from './services/analytics';
 import './App.css';
 
 const AdminRoute = ({ children }: { children: React.ReactNode }) => {
   const { user, isLoading } = useAuth();
 
-  if (isLoading) return <div className="flex justify-center items-center h-screen">Weryfikacja...</div>;
+  if (isLoading)
+    return <div className="flex justify-center items-center h-screen">Weryfikacja...</div>;
 
   if (!user) return <Navigate to="/login" replace />;
   if (user.role !== 'Admin') return <Navigate to="/" replace />;
@@ -39,13 +42,13 @@ const AppRoutes: React.FC = () => {
   useEffect(() => {
     const consent = localStorage.getItem('market_cookie_consent');
     if (consent === 'true') {
-        logPageView();
+      logPageView();
     }
   }, [location]);
 
   useEffect(() => {
     setShowTransition(true);
-    const timer = setTimeout(() => setShowTransition(false), 1500); 
+    const timer = setTimeout(() => setShowTransition(false), 1500);
     return () => clearTimeout(timer);
   }, [location.pathname]);
 
@@ -60,7 +63,7 @@ const AppRoutes: React.FC = () => {
           <h1 className="text-6xl font-bold text-blue-600 animate-pulse">Market</h1>
         </div>
       )}
-      
+
       <Layout isAuthenticated={!!user} setIsAuthenticated={logout} user={user}>
         <Routes>
           <Route path="/" element={<Home />} />
@@ -70,46 +73,65 @@ const AppRoutes: React.FC = () => {
           <Route path="/auction/:id" element={<AuctionDetail />} />
           <Route path="/announcements/:id" element={<AuctionDetail />} />
           <Route path="/users/:id" element={<UserProfilePage />} />
-          <Route 
-            path="/favorites" 
+
+          <Route
+            path="/orders"
+            element={
+              <ProtectedRoute>
+                <OrdersPage />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/messages"
+            element={
+              <ProtectedRoute>
+                <Messages />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/favorites"
             element={
               <ProtectedRoute>
                 <FavoritesPage />
               </ProtectedRoute>
-            } 
+            }
           />
-          <Route 
-            path="/add-announcement" 
+          <Route
+            path="/add-announcement"
             element={
               <ProtectedRoute>
                 <AddAnnouncementPage />
               </ProtectedRoute>
-            } 
+            }
           />
-          <Route 
-            path="/edit-announcement/:id" 
+          <Route
+            path="/edit-announcement/:id"
             element={
               <ProtectedRoute>
                 <EditAnnouncementPage />
               </ProtectedRoute>
-            } 
-          /> 
-          <Route 
-            path="/profile" 
+            }
+          />
+          <Route
+            path="/profile"
             element={
               <ProtectedRoute>
                 <ProfilePage />
               </ProtectedRoute>
-            } 
+            }
           />
-          
-          <Route 
-            path="/admin" 
+
+          <Route
+            path="/admin"
             element={
               <AdminRoute>
                 <AdminPanel />
               </AdminRoute>
-            } 
+            }
           />
         </Routes>
       </Layout>

@@ -11,7 +11,6 @@ interface Props {
 export const Gallery: React.FC<Props> = ({ announcement }) => {
   const [items, setItems] = useState<any[]>([]);
 
-  
   const getFullUrl = (path?: string): string => {
     if (!path) return 'https://placehold.co/800x600?text=Brak+zdjęcia';
     if (path.startsWith('http')) return path;
@@ -35,8 +34,6 @@ export const Gallery: React.FC<Props> = ({ announcement }) => {
       thumbnail: getFullUrl(photo.photoUrl),
       originalAlt: `${announcement.title} - ${announcement.category}`,
       thumbnailAlt: 'Miniaturka',
-      
-      
     }));
 
     setItems(galleryItems);
@@ -54,19 +51,17 @@ export const Gallery: React.FC<Props> = ({ announcement }) => {
         {items.length > 0 ? (
           <ImageGallery
             items={items}
-            showPlayButton={true}           
-            showFullscreenButton={true}      
-            showNav={true}                   
-            showThumbnails={true}            
-            thumbnailPosition="bottom"       
+            showPlayButton={true}
+            showFullscreenButton={true}
+            showNav={true}
+            showThumbnails={true}
+            thumbnailPosition="bottom"
             useBrowserFullscreen={true}
-            lazyLoad={true}                  
+            lazyLoad={true}
             slideDuration={450}
             slideInterval={4000}
             additionalClass="auction-gallery"
-            
             autoPlay={false}
-            
             showIndex={true}
             renderItem={(item) => (
               <div className="image-gallery-image">

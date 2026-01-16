@@ -16,7 +16,7 @@ const Login: React.FC = () => {
   const [message, setMessage] = useState<string>('');
   const navigate = useNavigate();
 
-  const SITE_KEY = import.meta.env.VITE_RECAPTCHA_SITE_KEY || "";
+  const SITE_KEY = import.meta.env.VITE_RECAPTCHA_SITE_KEY || '';
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -32,33 +32,33 @@ const Login: React.FC = () => {
     }
 
     try {
-      await axios.post(`${API_BASE_URL}/api/auth/login`, 
-        { 
-          ...formData, 
-          recaptchaToken: captchaToken 
-        }, 
+      await axios.post(
+        `${API_BASE_URL}/api/auth/login`,
+        {
+          ...formData,
+          recaptchaToken: captchaToken,
+        },
         { withCredentials: true }
       );
 
       setMessage('Zalogowano pomyślnie!');
-      window.location.href = '/'; 
-
+      window.location.href = '/';
     } catch (error) {
-      const axiosError = error as AxiosError<any>; 
-      
+      const axiosError = error as AxiosError<any>;
+
       let errorMsg = 'Błąd podczas logowania';
       if (axiosError.response?.data) {
-          const data = axiosError.response.data;
-          
-          if (typeof data === 'string') {
-              errorMsg = data; 
-          } else if (data.message) {
-              errorMsg = data.message; 
-          } else if (data.Message) {
-              errorMsg = data.Message;
-          } else if (data.title) {
-              errorMsg = data.title; 
-          }
+        const data = axiosError.response.data;
+
+        if (typeof data === 'string') {
+          errorMsg = data;
+        } else if (data.message) {
+          errorMsg = data.message;
+        } else if (data.Message) {
+          errorMsg = data.Message;
+        } else if (data.title) {
+          errorMsg = data.title;
+        }
       }
 
       setMessage(errorMsg);
@@ -67,17 +67,20 @@ const Login: React.FC = () => {
     }
   };
 
-  const inputClass = "w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition";
-  const labelClass = "block text-sm font-medium text-gray-700 mb-1";
+  const inputClass =
+    'w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition';
+  const labelClass = 'block text-sm font-medium text-gray-700 mb-1';
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-50 p-4">
       <div className="bg-white p-8 rounded-xl shadow-lg max-w-md w-full border border-gray-100">
         <h2 className="text-center mb-6 text-2xl font-bold text-gray-900">Zaloguj się</h2>
-        
+
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label htmlFor="username" className={labelClass}>Nazwa użytkownika</label>
+            <label htmlFor="username" className={labelClass}>
+              Nazwa użytkownika
+            </label>
             <input
               type="text"
               id="username"
@@ -89,9 +92,11 @@ const Login: React.FC = () => {
               required
             />
           </div>
-          
+
           <div>
-            <label htmlFor="password" className={labelClass}>Hasło</label>
+            <label htmlFor="password" className={labelClass}>
+              Hasło
+            </label>
             <input
               type="password"
               id="password"
@@ -105,15 +110,15 @@ const Login: React.FC = () => {
           </div>
 
           <div className="flex justify-center mt-4 mb-2">
-             <ReCAPTCHA
-                ref={recaptchaRef}
-                sitekey={SITE_KEY}
-                onChange={(token) => setCaptchaToken(token)}
-             />
+            <ReCAPTCHA
+              ref={recaptchaRef}
+              sitekey={SITE_KEY}
+              onChange={(token) => setCaptchaToken(token)}
+            />
           </div>
 
-          <button 
-            type="submit" 
+          <button
+            type="submit"
             className="w-full bg-blue-600 text-white py-3 rounded-lg font-bold hover:bg-blue-700 transition shadow-md mt-2"
           >
             Zaloguj się
@@ -121,17 +126,25 @@ const Login: React.FC = () => {
         </form>
 
         {message && (
-          <div className={`mt-4 p-3 rounded-lg text-center text-sm font-medium border ${
-            message.includes('pomyślnie') 
-                ? 'bg-green-50 text-green-700 border-green-200' 
+          <div
+            className={`mt-4 p-3 rounded-lg text-center text-sm font-medium border ${
+              message.includes('pomyślnie')
+                ? 'bg-green-50 text-green-700 border-green-200'
                 : 'bg-red-50 text-red-700 border-red-200'
-          }`}>
+            }`}
+          >
             {message}
           </div>
         )}
-        
+
         <p className="mt-6 text-center text-gray-600 text-sm">
-          Nie masz konta? <button onClick={() => navigate('/register')} className="text-blue-600 hover:underline font-medium">Zarejestruj się</button>
+          Nie masz konta?{' '}
+          <button
+            onClick={() => navigate('/register')}
+            className="text-blue-600 hover:underline font-medium"
+          >
+            Zarejestruj się
+          </button>
         </p>
       </div>
     </div>

@@ -18,7 +18,7 @@ const Register: React.FC = () => {
   const [message, setMessage] = useState<string>('');
   const navigate = useNavigate();
 
-  const SITE_KEY = import.meta.env.VITE_RECAPTCHA_SITE_KEY || "";
+  const SITE_KEY = import.meta.env.VITE_RECAPTCHA_SITE_KEY || '';
 
   useEffect(() => {
     const checkAuthStatus = async () => {
@@ -29,8 +29,7 @@ const Register: React.FC = () => {
         if (response.status === 200) {
           navigate('/');
         }
-      } catch (error) {
-      }
+      } catch (error) {}
     };
     checkAuthStatus();
   }, [navigate]);
@@ -73,34 +72,38 @@ const Register: React.FC = () => {
     try {
       const payload = {
         ...formData,
-        recaptchaToken: captchaToken
+        recaptchaToken: captchaToken,
       };
 
       const response = await axios.post(`${API_BASE_URL}/api/auth/register`, payload);
-      
-      setMessage(typeof response.data === 'string' ? response.data : 'Rejestracja zakończona pomyślnie!');
-      setTimeout(() => navigate('/login'), 1500);
 
+      setMessage(
+        typeof response.data === 'string' ? response.data : 'Rejestracja zakończona pomyślnie!'
+      );
+      setTimeout(() => navigate('/login'), 1500);
     } catch (error) {
       const axiosError = error as AxiosError;
       setMessage((axiosError.response?.data as string) || 'Błąd podczas rejestracji');
-      
+
       recaptchaRef.current?.reset();
       setCaptchaToken(null);
     }
   };
 
-  const inputClass = "w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition";
-  const labelClass = "block text-sm font-medium text-gray-700 mb-1";
+  const inputClass =
+    'w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition';
+  const labelClass = 'block text-sm font-medium text-gray-700 mb-1';
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-50 p-4">
       <div className="bg-white p-8 rounded-xl shadow-lg max-w-md w-full border border-gray-100">
         <h2 className="text-center mb-6 text-2xl font-bold text-gray-900">Utwórz konto</h2>
-        
+
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label htmlFor="username" className={labelClass}>Nazwa użytkownika</label>
+            <label htmlFor="username" className={labelClass}>
+              Nazwa użytkownika
+            </label>
             <input
               type="text"
               id="username"
@@ -112,9 +115,11 @@ const Register: React.FC = () => {
               required
             />
           </div>
-          
+
           <div>
-            <label htmlFor="email" className={labelClass}>Adres e-mail</label>
+            <label htmlFor="email" className={labelClass}>
+              Adres e-mail
+            </label>
             <input
               type="email"
               id="email"
@@ -126,9 +131,11 @@ const Register: React.FC = () => {
               required
             />
           </div>
-          
+
           <div>
-            <label htmlFor="password" className={labelClass}>Hasło</label>
+            <label htmlFor="password" className={labelClass}>
+              Hasło
+            </label>
             <input
               type="password"
               id="password"
@@ -140,9 +147,11 @@ const Register: React.FC = () => {
               required
             />
           </div>
-          
+
           <div>
-            <label htmlFor="confirmPassword" className={labelClass}>Potwierdź hasło</label>
+            <label htmlFor="confirmPassword" className={labelClass}>
+              Potwierdź hasło
+            </label>
             <input
               type="password"
               id="confirmPassword"
@@ -156,15 +165,15 @@ const Register: React.FC = () => {
           </div>
 
           <div className="flex justify-center mt-4 mb-2">
-             <ReCAPTCHA
-                ref={recaptchaRef}
-                sitekey={SITE_KEY}
-                onChange={(token) => setCaptchaToken(token)}
-             />
+            <ReCAPTCHA
+              ref={recaptchaRef}
+              sitekey={SITE_KEY}
+              onChange={(token) => setCaptchaToken(token)}
+            />
           </div>
 
-          <button 
-            type="submit" 
+          <button
+            type="submit"
             className="w-full bg-blue-600 text-white py-3 rounded-lg font-bold hover:bg-blue-700 transition shadow-md mt-2"
           >
             Zarejestruj się
@@ -172,13 +181,25 @@ const Register: React.FC = () => {
         </form>
 
         {message && (
-          <div className={`mt-4 p-3 rounded-lg text-center text-sm font-medium ${message.includes('pomyślnie') ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
+          <div
+            className={`mt-4 p-3 rounded-lg text-center text-sm font-medium ${
+              message.includes('pomyślnie')
+                ? 'bg-green-100 text-green-700'
+                : 'bg-red-100 text-red-700'
+            }`}
+          >
             {message}
           </div>
         )}
 
         <p className="mt-6 text-center text-gray-600 text-sm">
-          Masz już konto? <button onClick={() => navigate('/login')} className="text-blue-600 hover:underline font-medium">Zaloguj się</button>
+          Masz już konto?{' '}
+          <button
+            onClick={() => navigate('/login')}
+            className="text-blue-600 hover:underline font-medium"
+          >
+            Zaloguj się
+          </button>
         </p>
       </div>
     </div>
