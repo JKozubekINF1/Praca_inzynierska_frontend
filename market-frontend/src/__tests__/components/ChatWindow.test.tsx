@@ -7,6 +7,7 @@ vi.mock('../../services/chatService', () => ({
   chatService: {
     subscribeToChat: vi.fn(),
     sendMessage: vi.fn(),
+    markMessagesAsRead: vi.fn(),
   },
 }));
 
@@ -22,8 +23,8 @@ describe('ChatWindow', () => {
 
   it('renderuje wiadomości', () => {
     const messages = [
-      { id: '1', text: 'Cześć', senderId: 2, timestamp: Date.now() },
-      { id: '2', text: 'Witam', senderId: 1, timestamp: Date.now() },
+      { id: '1', text: 'Cześć', senderId: 2, timestamp: Date.now(), isRead: false },
+      { id: '2', text: 'Witam', senderId: 1, timestamp: Date.now(), isRead: true },
     ];
 
     (chatService.subscribeToChat as any).mockImplementation((_: any, callback: any) => {
@@ -59,8 +60,8 @@ describe('ChatWindow', () => {
 
     const input = screen.getByPlaceholderText('Napisz wiadomość...');
     fireEvent.change(input, { target: { value: 'Nowa wiadomość' } });
-    const sendBtn = screen.getByRole('button', { name: '' });
-    fireEvent.submit(sendBtn.closest('form')!);
+    const form = input.closest('form');
+    if (form) fireEvent.submit(form);
 
     await waitFor(() => {
       expect(chatService.sendMessage).toHaveBeenCalledWith('room1', 1, 'Ja', 'Nowa wiadomość');

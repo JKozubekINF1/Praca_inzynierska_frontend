@@ -16,14 +16,21 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ roomId, currentUser, otherUserN
   useEffect(() => {
     const unsubscribe = chatService.subscribeToChat(roomId, (data) => {
       setMessages(data);
+      const hasUnread = data.some((m) => m.senderId !== currentUser.id && !m.isRead);
+      if (hasUnread) {
+        chatService.markMessagesAsRead(roomId, currentUser.id);
+      }
     });
 
     return () => unsubscribe();
-  }, [roomId]);
+  }, [roomId, currentUser.id]);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
+  useEffect(() => {
+    chatService.markMessagesAsRead(roomId, currentUser.id);
+  }, [roomId, currentUser.id]);
 
   const handleSend = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -66,16 +73,19 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ roomId, currentUser, otherUserN
                 }`}
               >
                 <p>{msg.text}</p>
-                <span
-                  className={`text-[10px] block mt-1 text-right ${
-                    isMe ? 'text-blue-200' : 'text-gray-400'
-                  }`}
-                >
-                  {new Date(msg.timestamp).toLocaleTimeString([], {
-                    hour: '2-digit',
-                    minute: '2-digit',
-                  })}
-                </span>
+                <div className="flex justify-end items-center gap-1 mt-1">
+                  <span className={`text-[10px] ${isMe ? 'text-blue-200' : 'text-gray-400'}`}>
+                    {new Date(msg.timestamp).toLocaleTimeString([], {
+                      hour: '2-digit',
+                      minute: '2-digit',
+                    })}
+                  </span>
+                  {isMe && (
+                    <span className="text-[10px] text-blue-200 ml-1">
+                      {msg.isRead ? '✓✓' : '✓'}
+                    </span>
+                  )}
+                </div>
               </div>
             </div>
           );

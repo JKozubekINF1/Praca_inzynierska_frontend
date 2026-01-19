@@ -36,13 +36,13 @@ const Home: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 pb-20">
-      <div className="bg-gradient-to-r from-blue-700 to-blue-900 text-white py-20 px-4">
+    <div className="bg-gray-50 pb-12">
+      <div className="bg-gradient-to-r from-blue-700 to-blue-900 text-white py-12 px-4">
         <div className="container mx-auto max-w-4xl text-center">
-          <h1 className="text-4xl md:text-5xl font-extrabold mb-6 tracking-tight">
+          <h1 className="text-3xl md:text-5xl font-extrabold mb-4 tracking-tight">
             Znajdź swój wymarzony samochód lub część
           </h1>
-          <p className="text-blue-100 text-lg mb-8">
+          <p className="text-blue-100 text-base md:text-lg mb-8">
             Tysiące ogłoszeń motoryzacyjnych w jednym miejscu. Kupuj i sprzedawaj bezpiecznie.
           </p>
           <form
@@ -74,13 +74,13 @@ const Home: React.FC = () => {
         </div>
       </div>
 
-      <div className="container mx-auto px-4 -mt-10 relative z-10">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-16 max-w-4xl mx-auto">
+      <div className="container mx-auto px-4 -mt-8 relative z-10">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-12 max-w-4xl mx-auto">
           <Link
             to="/search?category=Pojazd"
-            className="bg-white p-6 rounded-xl shadow-lg hover:shadow-xl transition transform hover:-translate-y-1 flex items-center gap-6 group cursor-pointer border border-gray-100"
+            className="bg-white p-6 rounded-xl shadow-lg hover:shadow-xl transition transform hover:-translate-y-1 flex items-center gap-4 group cursor-pointer border border-gray-100"
           >
-            <div className="bg-blue-100 p-4 rounded-full text-blue-600 group-hover:bg-blue-600 group-hover:text-white transition-colors">
+            <div className="bg-blue-100 p-3 rounded-full text-blue-600 group-hover:bg-blue-600 group-hover:text-white transition-colors">
               <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path
                   strokeLinecap="round"
@@ -98,9 +98,9 @@ const Home: React.FC = () => {
 
           <Link
             to="/search?category=Część"
-            className="bg-white p-6 rounded-xl shadow-lg hover:shadow-xl transition transform hover:-translate-y-1 flex items-center gap-6 group cursor-pointer border border-gray-100"
+            className="bg-white p-6 rounded-xl shadow-lg hover:shadow-xl transition transform hover:-translate-y-1 flex items-center gap-4 group cursor-pointer border border-gray-100"
           >
-            <div className="bg-green-100 p-4 rounded-full text-green-600 group-hover:bg-green-600 group-hover:text-white transition-colors">
+            <div className="bg-green-100 p-3 rounded-full text-green-600 group-hover:bg-green-600 group-hover:text-white transition-colors">
               <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path
                   strokeLinecap="round"
@@ -122,10 +122,11 @@ const Home: React.FC = () => {
             </div>
           </Link>
         </div>
-        <div className="mb-8">
+
+        <div className="mb-12">
           <div className="flex justify-between items-end mb-6">
             <h2 className="text-2xl font-bold text-gray-800">Najnowsze ogłoszenia</h2>
-            <Link to="/search" className="text-blue-600 font-semibold hover:underline">
+            <Link to="/search" className="text-blue-600 font-semibold hover:underline text-sm">
               Zobacz wszystkie &rarr;
             </Link>
           </div>
@@ -135,7 +136,7 @@ const Home: React.FC = () => {
               <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-600"></div>
             </div>
           ) : recentAnnouncements.length === 0 ? (
-            <div className="text-center py-20 bg-white rounded-xl shadow-sm">
+            <div className="text-center py-12 bg-white rounded-xl shadow-sm border border-gray-100">
               <p className="text-gray-500 text-lg">Brak ogłoszeń. Bądź pierwszy!</p>
               <Link
                 to="/add-announcement"
@@ -149,21 +150,21 @@ const Home: React.FC = () => {
               {recentAnnouncements.map((item) => (
                 <Link to={`/announcements/${item.id}`} key={item.id} className="group">
                   <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-xl transition-all duration-300 h-full flex flex-col">
-                    <div className="aspect-w-16 aspect-h-10 bg-gray-200 relative h-56 overflow-hidden">
+                    <div className="aspect-w-16 aspect-h-10 bg-gray-200 relative h-48 overflow-hidden">
                       <img
                         src={getImageUrl(item.photoUrl)}
                         alt={item.title}
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                         onError={(e) => {
                           (e.target as HTMLImageElement).src =
-                            'https://via.placeholder.com/400x300?text=Brak+zdjęcia';
+                            'https://placehold.co/400x300?text=Brak+zdjecia';
                         }}
                       />
                       <div className="absolute top-3 left-3 bg-white/90 px-2 py-1 rounded text-xs font-bold text-gray-800 uppercase tracking-wide shadow-sm">
                         {item.category}
                       </div>
                     </div>
-                    <div className="p-5 flex flex-col flex-grow">
+                    <div className="p-4 flex flex-col flex-grow">
                       <div className="mb-2">
                         <h3 className="text-lg font-bold text-gray-900 line-clamp-1 group-hover:text-blue-600 transition-colors">
                           {item.title}
@@ -173,10 +174,10 @@ const Home: React.FC = () => {
                         </p>
                       </div>
 
-                      <div className="mt-auto pt-4 border-t border-gray-50 flex items-center justify-between">
-                        <span className="text-xl font-bold text-gray-900">
+                      <div className="mt-auto pt-3 border-t border-gray-50 flex items-center justify-between">
+                        <span className="text-lg font-bold text-gray-900">
                           {item.price.toLocaleString('pl-PL')}{' '}
-                          <span className="text-sm font-normal text-gray-500">PLN</span>
+                          <span className="text-xs font-normal text-gray-500">PLN</span>
                         </span>
                         <span className="text-xs text-gray-400 flex items-center gap-1">
                           <svg

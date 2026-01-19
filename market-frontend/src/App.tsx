@@ -19,6 +19,8 @@ import Layout from './components/Layout';
 import ProtectedRoute from './components/ProtectedRoute';
 import CookieBanner from './components/common/CookieBanner';
 import OrdersPage from './pages/OrdersPage';
+import ForgotPassword from './pages/ForgotPassword';
+import ResetPassword from './pages/ResetPassword';
 import { logPageView } from './services/analytics';
 import './App.css';
 
@@ -69,6 +71,10 @@ const AppRoutes: React.FC = () => {
           <Route path="/" element={<Home />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
+
+          <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route path="/reset-password" element={<ResetPassword />} />
+
           <Route path="/search" element={<Search />} />
           <Route path="/auction/:id" element={<AuctionDetail />} />
           <Route path="/announcements/:id" element={<AuctionDetail />} />

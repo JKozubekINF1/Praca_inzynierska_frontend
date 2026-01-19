@@ -29,8 +29,6 @@ const AuctionDetail: React.FC = () => {
   } | null>(null);
 
   const handleChatOpen = () => {
-    console.log('DANE OGŁOSZENIA:', announcement);
-
     if (!user) {
       toast.error('Musisz się zalogować, aby napisać wiadomość.');
       navigate('/login', { state: { from: location.pathname } });
@@ -40,7 +38,6 @@ const AuctionDetail: React.FC = () => {
     const sellerId = announcement?.userId || announcement?.user?.id;
 
     if (!sellerId) {
-      console.error('Brak ID sprzedawcy. Otrzymany obiekt:', announcement);
       toast.error('Błąd danych sprzedawcy (brak ID).');
       return;
     }
@@ -102,6 +99,27 @@ const AuctionDetail: React.FC = () => {
   return (
     <div className="bg-gray-50 min-h-screen py-8">
       <div className="container mx-auto px-4 max-w-6xl">
+        <button
+          onClick={() => navigate(-1)}
+          className="mb-6 flex items-center text-gray-600 hover:text-blue-600 transition font-medium group"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            strokeWidth={2}
+            stroke="currentColor"
+            className="w-5 h-5 mr-2 transform group-hover:-translate-x-1 transition-transform"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18"
+            />
+          </svg>
+          Wróć do wyników
+        </button>
+
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           <div className="lg:col-span-2 space-y-8">
             <Gallery announcement={announcement} />
@@ -115,51 +133,56 @@ const AuctionDetail: React.FC = () => {
           </div>
 
           <div className="lg:col-span-1 space-y-6">
-            <div className="bg-white p-6 rounded-2xl shadow-lg border border-gray-200 relative overflow-hidden">
-              <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-yellow-400 to-yellow-600"></div>
-              <div className="mb-6">
-                <h3 className="text-gray-500 text-sm font-medium uppercase tracking-wider mb-1">
-                  Cena
-                </h3>
-                <div className="text-4xl font-extrabold text-gray-900">
-                  {announcement.price.toLocaleString('pl-PL')}{' '}
-                  <span className="text-xl text-gray-500">PLN</span>
+            {announcement.category === 'Część' && (
+              <div className="bg-white p-6 rounded-2xl shadow-lg border border-gray-200 relative overflow-hidden">
+                <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-yellow-400 to-yellow-600"></div>
+                <div className="mb-6">
+                  <h3 className="text-gray-500 text-sm font-medium uppercase tracking-wider mb-1">
+                    Cena
+                  </h3>
+                  <div className="text-4xl font-extrabold text-gray-900">
+                    {announcement.price.toLocaleString('pl-PL')}{' '}
+                    <span className="text-xl text-gray-500">PLN</span>
+                  </div>
                 </div>
-              </div>
-              <div className="mb-6">
-                <label className="block text-sm font-bold text-gray-700 mb-2">Metoda dostawy</label>
-                {!selectedPoint ? (
-                  <button
-                    onClick={() => setIsInPostOpen(true)}
-                    className="w-full bg-white border-2 border-yellow-400 border-dashed text-gray-700 hover:bg-yellow-50 hover:border-yellow-500 font-medium py-3 rounded-xl transition flex items-center justify-center gap-2"
-                  >
-                    + Wybierz Automat Paczkowy
-                  </button>
-                ) : (
-                  <div className="bg-green-50 p-4 rounded-xl border border-green-200 animate-fade-in">
-                    <div className="text-xs text-green-800 font-bold uppercase mb-1">
-                      Wybrany punkt
-                    </div>
-                    <div className="font-bold text-gray-900">{selectedPoint.name}</div>
-                    <div className="text-xs text-gray-600 truncate">
-                      {selectedPoint.address?.line1}
-                    </div>
+                <div className="mb-6">
+                  <label className="block text-sm font-bold text-gray-700 mb-2">
+                    Metoda dostawy
+                  </label>
+                  {!selectedPoint ? (
                     <button
                       onClick={() => setIsInPostOpen(true)}
-                      className="text-blue-600 text-xs font-bold hover:underline mt-2"
+                      className="w-full bg-white border-2 border-yellow-400 border-dashed text-gray-700 hover:bg-yellow-50 hover:border-yellow-500 font-medium py-3 rounded-xl transition flex items-center justify-center gap-2"
                     >
-                      ZMIEŃ
+                      + Wybierz Automat Paczkowy
                     </button>
-                  </div>
-                )}
+                  ) : (
+                    <div className="bg-green-50 p-4 rounded-xl border border-green-200 animate-fade-in">
+                      <div className="text-xs text-green-800 font-bold uppercase mb-1">
+                        Wybrany punkt
+                      </div>
+                      <div className="font-bold text-gray-900">{selectedPoint.name}</div>
+                      <div className="text-xs text-gray-600 truncate">
+                        {selectedPoint.address?.line1}
+                      </div>
+                      <button
+                        onClick={() => setIsInPostOpen(true)}
+                        className="text-blue-600 text-xs font-bold hover:underline mt-2"
+                      >
+                        ZMIEŃ
+                      </button>
+                    </div>
+                  )}
+                </div>
+                <button
+                  onClick={handleBuyClick}
+                  className="w-full bg-black text-white hover:bg-gray-800 font-bold py-4 rounded-xl text-lg shadow-xl hover:shadow-2xl transition transform hover:-translate-y-0.5 flex items-center justify-center gap-2"
+                >
+                  KUP TERAZ
+                </button>
               </div>
-              <button
-                onClick={handleBuyClick}
-                className="w-full bg-black text-white hover:bg-gray-800 font-bold py-4 rounded-xl text-lg shadow-xl hover:shadow-2xl transition transform hover:-translate-y-0.5 flex items-center justify-center gap-2"
-              >
-                KUP TERAZ
-              </button>
-            </div>
+            )}
+
             <SellerSidebar announcement={announcement} onChatClick={handleChatOpen} />
           </div>
         </div>

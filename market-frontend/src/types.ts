@@ -1,6 +1,7 @@
 export interface LoginDto {
   username: string;
   password: string;
+  recaptchaToken: string;
 }
 
 export interface RegisterDto {
@@ -8,6 +9,7 @@ export interface RegisterDto {
   email: string;
   password: string;
   confirmPassword: string;
+  recaptchaToken: string;
 }
 
 export interface VehicleDetails {

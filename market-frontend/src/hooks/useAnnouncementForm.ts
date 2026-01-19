@@ -1,8 +1,9 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import type { CreateAnnouncementDto, VehicleDetails, PartDetails } from '../types';
 import { announcementService } from '../services/announcementService';
+import { userService } from '../services/userService';
 
 export const useAnnouncementForm = () => {
   const navigate = useNavigate();
@@ -47,6 +48,20 @@ export const useAnnouncementForm = () => {
     compatibility: '',
     state: 'Używany',
   });
+
+  useEffect(() => {
+    const fetchUserProfile = async () => {
+      try {
+        const profile = await userService.getProfile();
+        if (profile.phoneNumber) {
+          setBaseData((prev) => ({ ...prev, phoneNumber: profile.phoneNumber || '' }));
+        }
+      } catch (error) {
+        console.error('Nie udało się pobrać danych użytkownika', error);
+      }
+    };
+    fetchUserProfile();
+  }, []);
 
   const handleBaseChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
@@ -109,11 +124,22 @@ export const useAnnouncementForm = () => {
     setPartData({ ...partData, [e.target.name]: e.target.value });
   };
   const handlePhotosChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files) setPhotos(Array.from(e.target.files));
+    if (e.target.files) setPhotos((prev) => [...prev, ...Array.from(e.target.files || [])]);
   };
   const removePhoto = (index: number) => {
     setPhotos(photos.filter((_, i) => i !== index));
   };
+
+  const setMainPhoto = (index: number) => {
+    if (index === 0) return;
+    const newPhotos = [...photos];
+    const temp = newPhotos[0];
+    newPhotos[0] = newPhotos[index];
+    newPhotos[index] = temp;
+    setPhotos(newPhotos);
+    toast.success('Zmieniono zdjęcie główne');
+  };
+
   const toggleFeature = (feature: string) => {
     setFeatures((prev) =>
       prev.includes(feature) ? prev.filter((f) => f !== feature) : [...prev, feature]
@@ -136,6 +162,7 @@ export const useAnnouncementForm = () => {
   const buildDto = (): CreateAnnouncementDto => ({
     ...baseData,
     price: Number(baseData.price),
+    phoneNumber: baseData.phoneNumber || '',
     category,
     features,
     latitude: coords?.lat,
@@ -218,6 +245,7 @@ export const useAnnouncementForm = () => {
     handlePartChange,
     handlePhotosChange,
     removePhoto,
+    setMainPhoto,
     toggleFeature,
     submit,
     submitEdit,

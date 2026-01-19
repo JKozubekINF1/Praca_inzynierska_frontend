@@ -34,6 +34,7 @@ export const AnnouncementForm: React.FC<AnnouncementFormProps> = ({
     handlePartChange,
     handlePhotosChange,
     removePhoto,
+    setMainPhoto,
     toggleFeature,
     handleLocationBlur,
     handleMapClick,
@@ -43,6 +44,7 @@ export const AnnouncementForm: React.FC<AnnouncementFormProps> = ({
     'w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-black';
   const labelClass = 'block text-sm font-bold text-black mb-1';
   const errorClass = 'text-red-500 text-sm mt-1';
+  const isPhoneMissing = !baseData.phoneNumber;
 
   return (
     <div className="max-w-4xl mx-auto bg-white shadow-xl rounded-xl p-8 border border-gray-200">
@@ -149,10 +151,15 @@ export const AnnouncementForm: React.FC<AnnouncementFormProps> = ({
               <p className="text-sm text-blue-800 font-bold">
                 {title.includes('Edytuj')
                   ? 'Uwaga: Dodanie nowych zdjęć zastąpi stare.'
-                  : 'Dodaj zdjęcia (pierwsze będzie głównym)'}
+                  : 'Dodaj zdjęcia (pierwsze będzie głównym - użyj przycisku "Ustaw jako główne", aby zmienić kolejność)'}
               </p>
             </div>
-            <PhotoUploader photos={photos} onChange={handlePhotosChange} onRemove={removePhoto} />
+            <PhotoUploader
+              photos={photos}
+              onChange={handlePhotosChange}
+              onRemove={removePhoto}
+              onSetMain={setMainPhoto}
+            />
 
             {category === 'Pojazd' && (
               <div className="mt-6 border-t pt-6">
@@ -310,6 +317,7 @@ export const AnnouncementForm: React.FC<AnnouncementFormProps> = ({
                       <option>Używany</option>
                       <option>Nowy</option>
                       <option>Uszkodzony</option>
+                      <option>Regenerowany</option>
                     </select>
                   </div>
                 </div>
@@ -375,6 +383,7 @@ export const AnnouncementForm: React.FC<AnnouncementFormProps> = ({
                       <option>Używany</option>
                       <option>Nowy</option>
                       <option>Regenerowany</option>
+                      <option>Uszkodzony</option>
                     </select>
                   </div>
                 </div>
@@ -392,27 +401,42 @@ export const AnnouncementForm: React.FC<AnnouncementFormProps> = ({
                   className={`${inputClass} h-40`}
                 />
               </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-1 gap-4">
                 <div>
-                  <label className={labelClass}>Telefon</label>
-                  <input
-                    name="phoneNumber"
-                    value={baseData.phoneNumber}
-                    onChange={handleBaseChange}
-                    className={inputClass}
-                  />
-                </div>
-                <div>
-                  <label className={labelClass}>Preferencja kontaktu</label>
-                  <select
-                    name="contactPreference"
-                    value={baseData.contactPreference}
-                    onChange={handleBaseChange}
-                    className={inputClass}
-                  >
-                    <option>Telefon</option>
-                    <option>Email</option>
-                  </select>
+                  <label className={labelClass}>Kontakt telefoniczny</label>
+                  {isPhoneMissing ? (
+                    <div className="bg-blue-50 border border-blue-400 text-blue-800 p-4 rounded flex items-center shadow-sm">
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        strokeWidth={1.5}
+                        stroke="currentColor"
+                        className="w-6 h-6 mr-3 text-blue-600"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          d="M7.5 8.25h9m-9 3H12m-9.75 1.51c0 1.6 1.123 2.994 2.707 3.227 1.129.166 2.27.293 3.423.379.35.026.67.21.865.501L12 21l2.755-4.133a1.14 1.14 0 0 1 .865-.501 48.172 48.172 0 0 0 3.423-.379c1.584-.233 2.707-1.626 2.707-3.228V6.741c0-1.602-1.123-2.995-2.707-3.228A48.394 48.394 0 0 0 12 3c-2.392 0-4.744.175-7.043.513C3.373 3.746 2.25 5.14 2.25 6.741v6.018Z"
+                        />
+                      </svg>
+                      <div>
+                        <p className="font-bold">Nie posiadasz numeru telefonu w profilu.</p>
+                        <p className="text-sm mt-1">
+                          Ogłoszenie zostanie dodane bez numeru. Zainteresowani będą mogli
+                          kontaktować się z Tobą wyłącznie przez <strong>wbudowany czat</strong>.
+                        </p>
+                      </div>
+                    </div>
+                  ) : (
+                    <input
+                      name="phoneNumber"
+                      value={baseData.phoneNumber}
+                      readOnly
+                      className={`${inputClass} bg-gray-100 text-gray-600 cursor-not-allowed`}
+                      placeholder="Numer pobrany z profilu..."
+                    />
+                  )}
                 </div>
               </div>
             </div>

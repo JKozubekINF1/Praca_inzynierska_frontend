@@ -6,8 +6,7 @@ import React, {
   type ReactNode,
   useCallback,
 } from 'react';
-import axios from 'axios';
-import { API_BASE_URL } from '../config';
+import { authService } from '../services/authService';
 
 export interface User {
   id: number;
@@ -20,7 +19,7 @@ interface AuthContextType {
   user: User | null;
   isAuthenticated: boolean;
   isLoading: boolean;
-  login: (userData: User) => void;
+  login: (username: string, password: string, recaptchaToken: string) => Promise<void>;
   logout: () => Promise<void>;
   refreshAuth: () => Promise<void>;
 }
@@ -30,22 +29,13 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
-  const authClient = axios.create({
-    baseURL: API_BASE_URL,
-    withCredentials: true,
-  });
 
   const checkAuth = useCallback(async () => {
     try {
-      const response = await authClient.get('/api/auth/verify');
+      const response = await authService.verify();
 
       if (response.status === 200 && response.data.user) {
-        setUser({
-          id: response.data.user.id,
-          username: response.data.user.username,
-          role: response.data.user.role,
-          email: response.data.user.email,
-        });
+        setUser(response.data.user);
       } else {
         setUser(null);
       }
@@ -60,13 +50,14 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     checkAuth();
   }, [checkAuth]);
 
-  const login = (userData: User) => {
-    setUser(userData);
+  const login = async (username: string, password: string, recaptchaToken: string) => {
+    await authService.login({ username, password, recaptchaToken });
+    await checkAuth();
   };
 
   const logout = async () => {
     try {
-      await authClient.post('/api/auth/logout');
+      await authService.logout();
     } catch (error) {
       console.error('Błąd wylogowania:', error);
     }

@@ -1,4 +1,4 @@
-import { ref, push, onValue, off, get } from 'firebase/database';
+import { ref, push, onValue, off, get, update } from 'firebase/database';
 import { db } from '../config/firebase';
 
 export interface ChatMessage {
@@ -7,6 +7,7 @@ export interface ChatMessage {
   senderName: string;
   text: string;
   timestamp: number;
+  isRead: boolean;
 }
 
 export interface ChatSummary {
@@ -29,6 +30,7 @@ export const chatService = {
       senderName,
       text,
       timestamp: Date.now(),
+      isRead: false,
     });
   },
 
@@ -47,6 +49,59 @@ export const chatService = {
     });
 
     return () => off(messagesRef);
+  },
+
+  markMessagesAsRead: async (roomId: string, currentUserId: number) => {
+    const messagesRef = ref(db, `chats/${roomId}/messages`);
+    const snapshot = await get(messagesRef);
+    const data = snapshot.val();
+
+    if (data) {
+      const updates: Record<string, any> = {};
+      Object.keys(data).forEach((key) => {
+        const msg = data[key];
+        if (msg.senderId !== currentUserId && !msg.isRead) {
+          updates[`/${key}/isRead`] = true;
+        }
+      });
+
+      if (Object.keys(updates).length > 0) {
+        await update(messagesRef, updates);
+      }
+    }
+  },
+
+  subscribeToTotalUnreadCount: (userId: number, callback: (count: number) => void) => {
+    const chatsRef = ref(db, 'chats');
+
+    onValue(chatsRef, (snapshot) => {
+      const data = snapshot.val();
+      let totalUnread = 0;
+
+      if (data) {
+        Object.keys(data).forEach((chatKey) => {
+          const parts = chatKey.split('_');
+          if (parts.length === 4) {
+            const buyerId = parseInt(parts[2]);
+            const sellerId = parseInt(parts[3]);
+
+            if (buyerId === userId || sellerId === userId) {
+              const messages = data[chatKey].messages;
+              if (messages) {
+                Object.values(messages).forEach((msg: any) => {
+                  if (msg.senderId !== userId && !msg.isRead) {
+                    totalUnread++;
+                  }
+                });
+              }
+            }
+          }
+        });
+      }
+      callback(totalUnread);
+    });
+
+    return () => off(chatsRef);
   },
 
   getMyChats: async (userId: number): Promise<ChatSummary[]> => {
