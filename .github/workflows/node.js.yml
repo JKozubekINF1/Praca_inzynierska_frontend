@@ -9,6 +9,11 @@ on:
 jobs:
   unit-test:
     runs-on: ubuntu-latest
+    
+    # 🔥 Poinformuj GitHub, że wszystkie komendy 'run' mają dziać się w tym folderze
+    defaults:
+      run:
+        working-directory: market-frontend
 
     steps:
     - name: Checkout code
@@ -18,11 +23,12 @@ jobs:
       uses: actions/setup-node@v4
       with:
         node-version: 20
+        # Wskazujemy ścieżkę do pliku lock, żeby cache zadziałał poprawnie
         cache: 'npm'
+        cache-dependency-path: market-frontend/package-lock.json
 
     - name: Install dependencies
       run: npm ci
 
     - name: Run Unit Tests
-      # Dodajemy flagę --run, aby vitest wykonał testy raz i zakończył proces
       run: npm test -- --run
