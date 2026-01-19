@@ -66,7 +66,7 @@ export const AnnouncementForm: React.FC<AnnouncementFormProps> = ({
             }`}
           >
             <option value="">-- Wybierz kategorię --</option>
-            <option value="Pojazd">Samochód osobowy</option>
+            <option value="Pojazd">Pojazd</option>
             <option value="Część">Część samochodowa</option>
           </select>
         </div>
